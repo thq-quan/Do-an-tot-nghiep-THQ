@@ -5,7 +5,7 @@ import pickle
 import category_encoders as ce
 from sklearn.linear_model import LogisticRegression
 
-data = pd.read_csv("D:\doantotnghiep\datairender.csv")
+data = pd.read_csv("https://raw.githubusercontent.com/thq-quan/Do-an-tot-nghiep-THQ/main/datairender.csv")
 X = data.drop(['is_paid'], axis=1)
 y = data['is_paid']
 encoder = ce.OrdinalEncoder(cols=['region','language','package'])
