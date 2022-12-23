@@ -3,24 +3,28 @@ import pandas as pd
 import streamlit as st
 import pickle
 import category_encoders as ce
+from sklearn.linear_model import LogisticRegression
 
 data = pd.read_csv("D:\doantotnghiep\datairender.csv")
 X = data.drop(['is_paid'], axis=1)
+y = data['is_paid']
 encoder = ce.OrdinalEncoder(cols=['region','language','package'])
-X_transform = encoder.fit_transform(X)
+X = encoder.fit_transform(X)
+model_LR = LogisticRegression(class_weight='balanced')
+model_LR.fit(X,y)
 
 st.set_page_config(
-    page_title= "Home Page",
+    page_title= "Ứng dụng dự đoán",
     page_icon= "👋"
 )
 
 st.write("""
-# Prediction App for user iRender
-This app predicts the **User paid**!
+# ỨNG DỤNG DỰ ĐOÁN KHÁCH HÀNG CỦA IRENDER VIETNAM
+Ứng dụng này để dự đoán **Khách hàng trả tiền**!
 """)
 
 # data của ng dùng nhập vào để dự đoán
-st.sidebar.header('User Input Parameters')
+st.sidebar.header('Thông số đầu vào của khách hàng muốn dự đoán')
 re = data['region']
 re_list = list(set(re))
 la = data['language']
@@ -52,22 +56,20 @@ def user_input_features():
     return features
 # kq sau khi ng dùng nhập   
 df = user_input_features()
-st.subheader('User Input parameters')
+st.subheader('Thông số đầu vào của khách hàng muốn dự đoán')
 st.write(df)
 
 df = encoder.transform(df)
 
-load_model = pickle.load(open('model.pkl', 'rb'))
-
 # hàm dự đoán và tỷ lệ giữa 2 lớp
-prediction = load_model.predict(df)
-prediction_proba = load_model.predict_proba(df)
+prediction = model_LR.predict(df)
+prediction_proba = model_LR.predict_proba(df)
 # show dự đoán của mô hình
-st.subheader('Prediction')
-paid = np.array(['free','paid'])
+st.subheader('Kết quả dự đoán')
+paid = np.array(['Khách hàng miễn phí','Khách hàng trả tiền'])
 st.write(paid[prediction])
 # show tỉ lệ giữa 2 lớp
-st.subheader('Prediction Probability')
+st.subheader('Xác suất dự đoán của hai lớp')
 st.write(prediction_proba)
 st.write("**DataFame**")
 st.dataframe(data)
